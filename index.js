@@ -1,43 +1,60 @@
-const  express = require('express');
-const mongoose=require('mongoose');
-const http=require('http')
+const express = require('express');
+const mongoose = require('mongoose');
+const http = require('http')
 const app = express()
 app.use(express.json());
 //db connection//
-mongoose.connect("mongodb+srv://siva:CGD4KKLX635lDapZ@cluster0.tveigf0.mongodb.net/connectdatabase?retryWrites=true&w=majority",{
-useNewUrlParser:true,
-useUnifiedTopology:true
-},(err)=>{
-    if(!err){
+mongoose.connect("mongodb+srv://siva:CGD4KKLX635lDapZ@cluster0.tveigf0.mongodb.net/connectdatabase?retryWrites=true&w=majority", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}, (err) => {
+    if (!err) {
         console.log("connected db");
-    }
-    else{
+    } else {
         console.log("lost connection");
     }
 })
 
-const schema={
-      sName:String,
-      email:String,
-      id:Number
+const schema = {
+    sName: String,
+    email: String,
+    id: Number
 }
-const monModel=mongoose.model("NEWCOL",schema);
+const monModel = mongoose.model("NEWCOL", schema);
 
 //post//
-app.post("/post",async(req,res)=>{
+app.post("/post", async (req, res) => {
     console.log("inside post function");
-    const data=new monModel({
-        sName:req.body.sName,
-        email:req.body.email,
-        id:req.body.id
+    const data = new monModel({
+        sName: req.body.sName,
+        email: req.body.email,
+        id: req.body.id
 
     });
 
-const datavalue=await data.save();
-res.json(datavalue);
+    const datavalue = await data.save();
+    res.json(datavalue);
 
 })
 
+app.put("/update/:id",async(req,res)=>{
+    let upId=req.params.id;
+    let upName=req.body.sName;
+    let upEmail=req.body.email;
+    //find id//
+    monModel.findOneAndUpdate({id:upId},{$set:{sName:upName,email:upEmail}},
+        {new:true},(err,data)=>{
+
+            if (data==null) {res.send("no data")
+                
+            } else {
+                res.send(data)
+              
+            }
+
+    })
+
+})
 
 
 const port = 3000;
